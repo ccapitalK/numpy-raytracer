@@ -6,7 +6,8 @@ import math as m
 
 EPSILON = 1e-6
 
-c_zero3 = np.array([0, 0, 0])
+c_zero3 = np.array([0., 0., 0.])
+c_one3 = np.array([1., 1., 1.])
 _clip01_min = np.array([0])
 _clip01_max = np.array([1])
 def clip01(v):

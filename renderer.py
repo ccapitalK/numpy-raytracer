@@ -43,18 +43,18 @@ class Renderer:
     def calc_pixel(self, x, y):
         self.colour[1] = y / self.width
         ray = self.cast_ray_from_camera(x/self.width, y/self.height)
-        return 255 * clip01(self.cast_ray(c_zero3, ray))
+        return 255 * clip01(self.cast_ray(c_zero3.copy(), ray))
 
     def cast_ray(self, pos, dir):
         "Cast ray from pos in dir (dir should be normalized)"
         while True:
-            (min_dist, closest) = self.scene.min_dist(pos)
-            if min_dist > 1e3:
+            min_dist, closest = self.scene.min_dist(pos)
+            if min_dist > 1e6:
                 # Assume way past edge of scene
                 return self.sky
             if min_dist < 1e-3:
                 return closest.material.albedo
-            pos = pos + dir * min_dist
+            pos += dir * min_dist
 
     def cast_ray_from_camera(self, xfrac, yfrac):
         # TODO optimize further?

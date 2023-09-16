@@ -14,19 +14,16 @@ class Scene:
                 self.spheres.append(obj)
 
     def _prepare(self):
-        # TODO
-        self._sphere_centers = np.zeros((len(self.spheres), 3))
+        self._sphere_centers = np.concatenate([s.position for s in self.spheres])
+        self._sphere_centers = self._sphere_centers.reshape((-1, 3))
+        self._sphere_radii = np.array([s.radius for s in self.spheres])
         self._prepared = True
 
     def min_dist(self, pos):
         "Min signed dist from position to a surface in the scene + closest object"
         if not self._prepared:
             self._prepare()
-        min_dist, closest = m.inf, None
-        for sphere in self.spheres:
-            # TODO: Opt dist2
-            curr_dist = dist(pos, sphere.position) - sphere.radius
-            if curr_dist < min_dist:
-                closest = sphere
-                min_dist = curr_dist
-        return (min_dist, closest)
+        delta2s = (pos - self._sphere_centers) ** 2
+        sdists = np.matmul(delta2s, c_one3) ** .5 - self._sphere_radii
+        i = np.argmin(sdists)
+        return (sdists[i], self.spheres[i])

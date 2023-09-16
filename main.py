@@ -27,4 +27,3 @@ renderer.set_sky_color(sky_blue)
 pil_image = Image.fromarray(renderer.draw_image())
 
 bitmap_image = pil_image.save('output.png')
-

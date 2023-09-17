@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 from imports import *
-import numpy as np
-import math as m
 
 EPSILON = 1e-6
 
@@ -46,6 +44,9 @@ def lerp(a, b, t):
 
 def normalize(v):
     return v / length(v)
+
+def reflect(d, n):
+    return d - n * 2 * np.dot(d, n)
 
 def prep_rotate_yaw(theta):
     "Rotate clockwise around z axis"
@@ -94,4 +95,7 @@ if __name__ == '__main__':
     assert(FLESS(2 * -EPSILON, 0))
     assert(not FLESS(0, 0))
     assert(FLEQ(0, 0))
+    norm = normalize(np.array([-1, 1, 0]))
+    ray = np.array([1, 0, 0])
+    assert(FEQ(dist(reflect(ray, norm), (0, 1, 0)), 0))
     print("All tests passed")

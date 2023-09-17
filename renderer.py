@@ -22,23 +22,20 @@ def make_edgeray_matrix(edgerays):
     return np.concatenate(edgerays).reshape((4,3))
 
 class Renderer:
-    def __init__(self, width, height):
+    def __init__(self, width, height, scene):
         width = int(width)
         height = int(height)
         self.colour = np.zeros(3)
         self.bitmap_data = np.zeros((height, width, 3), dtype=np.uint8)
         self.width = width
         self.height = height
-        self.scene = Scene()
+        self.scene = scene
         self.camera_edge_rays = calc_edge_rays(width / height)
         self.camera_edgeray_matrix = make_edgeray_matrix(self.camera_edge_rays)
         self.sky = c_zero3
 
     def set_sky_color(self, color):
         self.sky = np.array(color)
-
-    def add_object(self, o):
-        self.scene.add_object(o)
 
     def calc_pixel(self, x, y):
         self.colour[1] = y / self.width

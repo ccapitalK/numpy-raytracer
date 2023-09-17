@@ -30,7 +30,9 @@ class Renderer:
         self.width = width
         self.height = height
         self.scene = scene
-        self.camera_edge_rays = calc_edge_rays(width / height)
+        # Skew down
+        skew = np.array([0, 0, 0.5])
+        self.camera_edge_rays = [v - skew for v in calc_edge_rays(height / width)]
         self.camera_edgeray_matrix = make_edgeray_matrix(self.camera_edge_rays)
         self.sky = c_zero3
 
@@ -42,16 +44,26 @@ class Renderer:
         ray = self.cast_ray_from_camera(x/self.width, y/self.height)
         return 255 * clip01(self.cast_ray(c_zero3.copy(), ray))
 
-    def cast_ray(self, pos, dir):
+    def cast_ray(self, pos, dir, depth=6):
         "Cast ray from pos in dir (dir should be normalized)"
         while True:
-            min_dist, closest = self.scene.min_dist(pos)
-            if min_dist > 1e6:
+            min_dist, closest = self.scene.min_dist(pos, dir)
+            if min_dist > 1e5:
                 # Assume way past edge of scene
                 return self.sky
             if min_dist < 1e-3:
-                return closest.material.albedo
+                mat = closest.material
+                norm = closest.get_norm(pos)
+                obj_color = self.calc_incident_color(pos, dir, closest, norm)
+                if FLEQ(mat.reflect, 0) or depth <= 1:
+                    return obj_color
+                reflected = reflect(dir, norm)
+                next = self.cast_ray(pos + reflected * 1e-3, reflected, depth-1)
+                return lerp(obj_color, next, mat.reflect)
             pos += dir * min_dist
+
+    def calc_incident_color(self, pos, dir, obj, norm):
+        return obj.material.albedo
 
     def cast_ray_from_camera(self, xfrac, yfrac):
         # TODO optimize further?
@@ -67,8 +79,10 @@ class Renderer:
         return normalize(np.matmul(coeff, self.camera_edgeray_matrix))
 
     def draw_image(self):
-        for x in range(self.width):
-            for y in range(self.height):
+        for y in range(self.height):
+            if y % 8 == 0:
+                print(f"Scanline {y}/{self.height}")
+            for x in range(self.width):
                 self.bitmap_data[y, x][:] = self.calc_pixel(x, y)
         return self.bitmap_data
 

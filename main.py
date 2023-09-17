@@ -3,7 +3,10 @@
 from PIL import Image
 from imports import *
 from renderer import *
-from material import *
+import material
+from scene import *
+
+import random
 import sys
 
 match len(sys.argv):
@@ -14,17 +17,30 @@ match len(sys.argv):
     case _:
         width = height = 128
 
-red = Material([1, 0, 0.2])
-green = Material([0, 1, 0.2])
+red = material.Material([1, 0, 0.2])
+green = material.Material([0, 1, 0.2])
+ground = material.Material([0.5, 0.5, 0.7])
 sky_blue = [0, 0.5, 1]
 
-scene = Scene()
-# scene.add_object(Sphere([0, 3, 0], 1.0, red))
-# scene.add_object(Sphere([1, 3, 1], 1.0, green))
-# scene.add_object(Sphere([-1, 3, 1], 1.0, green))
-for x in range(-4, 5):
-    for z in range(-4, 5):
-        scene.add_object(Sphere([x, 5, z], 0.25, green))
+random.seed(1337)
+
+def rand_sphere():
+    # TODO: Better choice here, maybe using hsv instead?
+    r = random.uniform(0.3, 0.7)
+    g = random.uniform(0.3, 0.7)
+    b = random.uniform(0.3, 0.7)
+    x = random.uniform(-50, 50)
+    y = random.uniform(-50, 50)
+    reflect = max(0, random.uniform(-0.2, 0.8))
+    size = random.uniform(0.5, 2)
+    z = GROUND_Z + size
+    pos = np.array([x, y, z])
+    mat = material.Material([r, g, b], reflect=reflect)
+    return Sphere(pos, size, mat)
+
+scene = Scene(ground)
+for i in range(300):
+    scene.add_object(rand_sphere())
 
 renderer = Renderer(width, height, scene)
 

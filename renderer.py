@@ -31,7 +31,7 @@ class Renderer:
         self.height = height
         self.scene = scene
         # Skew down
-        skew = np.array([0, 0, 0.5])
+        skew = np.array([0, 0, 0.4])
         self.camera_edge_rays = [v - skew for v in calc_edge_rays(height / width)]
         self.camera_edgeray_matrix = make_edgeray_matrix(self.camera_edge_rays)
         self.sky = c_zero3

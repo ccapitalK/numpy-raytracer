@@ -39,6 +39,9 @@ class Renderer:
     def set_sky_color(self, color):
         self.sky = np.array(color)
 
+    def get_sky(self, pos):
+        return self.sky
+
     def calc_pixel(self, x, y):
         self.colour[1] = y / self.width
         ray = self.cast_ray_from_camera(x/self.width, y/self.height)
@@ -53,18 +56,18 @@ class Renderer:
             min_dist, closest = self.scene.min_dist(pos, dir)
             if min_dist > 1e5:
                 # Assume way past edge of scene
-                return min_dist, None
+                return pos, None
             if min_dist < 1e-3:
-                return min_dist, closest
+                return pos, closest
             pos += dir * min_dist
 
     def cast_ray(self, pos, dir, depth=10):
         "Cast ray from pos in dir (dir should be normalized)"
-        dist, closest = self.march_ray(pos, dir)
+        final_pos, closest = self.march_ray(pos, dir)
         if closest is None:
-            return self.sky
+            return self.get_sky(final_pos)
         mat = closest.material
-        norm = closest.get_norm(pos)
+        norm = closest.get_norm(final_pos)
         obj_color = self.calc_incident_color(pos, dir, closest, norm)
         if FLEQ(mat.reflect, 0) or depth <= 1:
             return obj_color

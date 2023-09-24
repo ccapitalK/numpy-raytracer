@@ -11,6 +11,7 @@ class Scene:
         self._sphere_centers = None
         self._ground = Ground(ground_material)
         self.light_position = np.array([0, 0, 2])
+        self.light_dir = normalize(self.light_position)
 
     def add_object(self, obj):
         self._prepared = False
@@ -19,7 +20,8 @@ class Scene:
                 self.spheres.append(obj)
 
     def set_light(self, pos):
-        self.light_position = pos
+        self.light_position = np.array(pos)
+        self.light_dir = normalize(self.light_position)
 
     def get_light_dir(self, pos):
         return normalize(self.light_position-pos)

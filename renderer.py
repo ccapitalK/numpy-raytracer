@@ -36,11 +36,12 @@ class Renderer:
         self.camera_edgeray_matrix = make_edgeray_matrix(self.camera_edge_rays)
         self.sky = c_zero3
 
-    def set_sky_color(self, color):
-        self.sky = np.array(color)
+    def set_sky_colors(self, colors):
+        self.sky = colors
 
     def get_sky(self, pos):
-        return self.sky
+        t = .5 - (np.dot(normalize(pos), self.scene.light_dir) * .5)
+        return lerp(self.sky[0], self.sky[1], t)
 
     def calc_pixel(self, x, y):
         self.colour[1] = y / self.width
@@ -68,11 +69,11 @@ class Renderer:
             return self.get_sky(final_pos)
         mat = closest.material
         norm = closest.get_norm(final_pos)
-        obj_color = self.calc_incident_color(pos, dir, closest, norm)
+        obj_color = self.calc_incident_color(final_pos, dir, closest, norm)
         if FLEQ(mat.reflect, 0) or depth <= 1:
             return obj_color
         reflected = reflect(dir, norm)
-        next = self.cast_ray(pos + reflected * 1e-3, reflected, depth-1)
+        next = self.cast_ray(final_pos + reflected * 1e-3, reflected, depth-1)
         return lerp(obj_color, next, mat.reflect)
 
     def calc_incident_color(self, pos, dir, obj, norm):

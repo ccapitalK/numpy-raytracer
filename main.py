@@ -20,7 +20,7 @@ match len(sys.argv):
 red = material.Material([1, 0, 0.2])
 green = material.Material([0, 1, 0.2])
 ground = material.Material([0.5, 0.5, 0.7])
-sky_blue = [0, 0.5, 1]
+sky_blue_gradient = np.array([[0, 0.1, 0.8], [0, 0.5, 1]])
 
 random.seed(1337)
 
@@ -39,12 +39,13 @@ def rand_sphere():
     return Sphere(pos, size, mat)
 
 scene = Scene(ground)
+scene.set_light([0, 0, 1000])
 for i in range(500):
     scene.add_object(rand_sphere())
 
 renderer = Renderer(width, height, scene)
 
-renderer.set_sky_color(sky_blue)
+renderer.set_sky_colors(sky_blue_gradient)
 
 pil_image = Image.fromarray(renderer.draw_image())
 

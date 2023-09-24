@@ -44,26 +44,40 @@ class Renderer:
         ray = self.cast_ray_from_camera(x/self.width, y/self.height)
         return 255 * clip01(self.cast_ray(c_zero3.copy(), ray))
 
-    def cast_ray(self, pos, dir, depth=6):
-        "Cast ray from pos in dir (dir should be normalized)"
+    def march_ray(self, pos, dir):
+        """
+        Cast ray from pos in dir (dir should be normalized)
+        Returns: (distance, closest_object)
+        """
         while True:
             min_dist, closest = self.scene.min_dist(pos, dir)
             if min_dist > 1e5:
                 # Assume way past edge of scene
-                return self.sky
+                return min_dist, None
             if min_dist < 1e-3:
-                mat = closest.material
-                norm = closest.get_norm(pos)
-                obj_color = self.calc_incident_color(pos, dir, closest, norm)
-                if FLEQ(mat.reflect, 0) or depth <= 1:
-                    return obj_color
-                reflected = reflect(dir, norm)
-                next = self.cast_ray(pos + reflected * 1e-3, reflected, depth-1)
-                return lerp(obj_color, next, mat.reflect)
+                return min_dist, closest
             pos += dir * min_dist
 
+    def cast_ray(self, pos, dir, depth=6):
+        "Cast ray from pos in dir (dir should be normalized)"
+        dist, closest = self.march_ray(pos, dir)
+        if closest is None:
+            return self.sky
+        mat = closest.material
+        norm = closest.get_norm(pos)
+        obj_color = self.calc_incident_color(pos, dir, closest, norm)
+        if FLEQ(mat.reflect, 0) or depth <= 1:
+            return obj_color
+        reflected = reflect(dir, norm)
+        next = self.cast_ray(pos + reflected * 1e-3, reflected, depth-1)
+        return lerp(obj_color, next, mat.reflect)
+
     def calc_incident_color(self, pos, dir, obj, norm):
-        return obj.material.albedo
+        ndir = dir * -1
+        light_dir = self.scene.get_light_dir(pos)
+        diff = max(0, np.dot(norm, light_dir))
+        spec = 0
+        return obj.material.get_color(diff, spec)
 
     def cast_ray_from_camera(self, xfrac, yfrac):
         # TODO optimize further?

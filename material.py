@@ -11,5 +11,6 @@ class Material:
         self.transparency = transparency
 
     def get_color(self, diff, spec):
-        light = diff * self.diffuse + (spec ** self.shiny) * self.specular + self.ambient
+        # light = diff * self.diffuse + (spec ** self.shiny) * self.specular + self.ambient
+        light = diff * self.diffuse + self.ambient
         return light * self.albedo

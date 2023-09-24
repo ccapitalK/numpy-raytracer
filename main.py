@@ -35,7 +35,7 @@ def rand_sphere():
     size = random.uniform(0.5, 2)
     z = GROUND_Z + size
     pos = np.array([x, y, z])
-    mat = material.Material([r, g, b], reflect=reflect)
+    mat = material.Material([r, g, b], reflect=reflect, diffuse=0.3)
     return Sphere(pos, size, mat)
 
 scene = Scene(ground)

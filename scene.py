@@ -10,7 +10,7 @@ class Scene:
         self._prepared = False
         self._sphere_centers = None
         self._ground = Ground(ground_material)
-        self.camera_position = np.array([0, 0, 2])
+        self.light_position = np.array([0, 0, 2])
 
     def add_object(self, obj):
         self._prepared = False
@@ -18,8 +18,11 @@ class Scene:
             case Sphere:
                 self.spheres.append(obj)
 
-    def set_camera(self, pos):
-        self.camera_position = pos
+    def set_light(self, pos):
+        self.light_position = pos
+
+    def get_light_dir(self, pos):
+        return normalize(self.light_position-pos)
 
     def _prepare(self):
         self._sphere_centers = np.concatenate([s.position for s in self.spheres])

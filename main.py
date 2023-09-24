@@ -29,8 +29,8 @@ def rand_sphere():
     r = random.uniform(0.3, 0.7)
     g = random.uniform(0.3, 0.7)
     b = random.uniform(0.3, 0.7)
-    x = random.uniform(-50, 50)
-    y = random.uniform(-50, 50)
+    x = random.gauss(0, 50)
+    y = random.gauss(0, 50)
     reflect = max(0, random.uniform(-0.2, 0.8))
     size = random.uniform(0.5, 2)
     z = GROUND_Z + size

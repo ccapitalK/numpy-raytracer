@@ -58,7 +58,7 @@ class Renderer:
                 return min_dist, closest
             pos += dir * min_dist
 
-    def cast_ray(self, pos, dir, depth=6):
+    def cast_ray(self, pos, dir, depth=10):
         "Cast ray from pos in dir (dir should be normalized)"
         dist, closest = self.march_ray(pos, dir)
         if closest is None:

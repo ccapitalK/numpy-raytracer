@@ -7,6 +7,8 @@ from scene import *
 
 HFOV_DEGREES = 90
 HFOV = (HFOV_DEGREES / 180) * m.pi
+# Skew down
+_CAMERA_SKEW = np.array([0, 0, -0.4])
 
 def calc_edge_rays(vfov_ratio):
     assert(30 <= HFOV_DEGREES <= 150)
@@ -30,9 +32,7 @@ class Renderer:
         self.width = width
         self.height = height
         self.scene = scene
-        # Skew down
-        skew = np.array([0, 0, 0.4])
-        self.camera_edge_rays = [v - skew for v in calc_edge_rays(height / width)]
+        self.camera_edge_rays = [v + _CAMERA_SKEW for v in calc_edge_rays(height / width)]
         self.camera_edgeray_matrix = make_edgeray_matrix(self.camera_edge_rays)
         self.sky = c_zero3
 
@@ -105,11 +105,14 @@ class Renderer:
         return self.bitmap_data
 
 if __name__ == '__main__':
+    import material
     print("Running tests")
-    assert(FEQ(dist(calc_edge_rays(1)[0], (-1, 1, -1)), 0))
-    assert(FEQ(dist(calc_edge_rays(2)[0], (-1, 1, -2)), 0))
-    renderer = Renderer(16, 16)
-    assert(FEQ(dist(renderer.cast_ray_from_camera(0.5, 0.5), (0, 1, 0)), 0))
+    assert(FEQ(dist(calc_edge_rays(1)[0], np.array((-1., 1., -1.))), 0.))
+    assert(FEQ(dist(calc_edge_rays(2)[0], np.array((-1., 1., -2.))), 0.))
+    scene = Scene(material.Material((0., 0., 0.)))
+    renderer = Renderer(16, 16, scene)
+    expected_center = normalize(np.array((0., 1., 0.)) + _CAMERA_SKEW)
+    assert(FEQ(dist(renderer.cast_ray_from_camera(0.5, 0.5), expected_center), 0.))
     # Evenly interpolating the 4 should give the y axis basis
-    assert(FEQ(length(np.matmul([.25, .25, .25, .25], make_edgeray_matrix(calc_edge_rays(2)))), 1))
+    assert(FEQ(length(np.matmul([.25, .25, .25, .25], make_edgeray_matrix(calc_edge_rays(2.)))), 1))
     print("All tests passed")

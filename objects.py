@@ -15,4 +15,4 @@ class Ground:
         self.material = material
 
     def get_norm(self, pos):
-        return np.array((0, 0, 1))
+        return np.array((0., 0., 1.))

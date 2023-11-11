@@ -10,8 +10,7 @@ class Scene:
         self._prepared = False
         self._sphere_centers = None
         self._ground = Ground(ground_material)
-        self.light_position = np.array([0, 0, 2])
-        self.light_dir = normalize(self.light_position)
+        self.set_light((0., 0., 2.))
 
     def add_object(self, obj):
         self._prepared = False

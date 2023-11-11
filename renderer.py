@@ -79,14 +79,14 @@ class Renderer:
     def calc_incident_color(self, pos, dir, obj, norm):
         ndir = dir * -1
         light_dir = self.scene.get_light_dir(pos)
-        diff = max(0, np.dot(norm, light_dir))
-        spec = 0
+        diff = max(0., np.dot(norm, light_dir))
+        spec = 0.
         return obj.material.get_color(diff, spec)
 
     def cast_ray_from_camera(self, xfrac, yfrac):
         # TODO optimize further?
-        nxfrac = 1 - xfrac
-        nyfrac = 1 - yfrac
+        nxfrac = 1. - xfrac
+        nyfrac = 1. - yfrac
         # Note: We flip the y axis because our y goes up, but Pillow y axis goes down
         coeff = np.array([
             nxfrac * yfrac,

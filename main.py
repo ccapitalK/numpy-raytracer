@@ -39,7 +39,7 @@ def rand_sphere():
     return Sphere(pos, size, mat)
 
 scene = Scene(ground)
-scene.set_light([0, 0, 1000])
+scene.set_light([0., 0., 1000.])
 for i in range(500):
     scene.add_object(rand_sphere())
 

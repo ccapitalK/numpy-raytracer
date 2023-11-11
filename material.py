@@ -1,7 +1,7 @@
 from imports import *
 
 class Material:
-    def __init__(self, albedo, diffuse=0, ambient=1, specular=0, reflect=0, transparency=0, shiny=0.8):
+    def __init__(self, albedo, diffuse=0., ambient=1, specular=0., reflect=0., transparency=0., shiny=0.8):
         self.albedo = np.array(albedo)
         self.diffuse = diffuse
         self.specular = specular

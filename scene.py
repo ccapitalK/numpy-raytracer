@@ -15,8 +15,8 @@ class Scene:
 
     def add_object(self, obj):
         self._prepared = False
-        match type(obj):
-            case Sphere:
+        match obj:
+            case Sphere():
                 self.spheres.append(obj)
 
     def set_light(self, pos):
